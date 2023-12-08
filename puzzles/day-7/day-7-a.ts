@@ -22,7 +22,11 @@ function compare(h1: Hand, h2: Hand) {
   return 0;
 }
 
+<<<<<<< HEAD
 function evaludateHand(hand: Hand) {
+=======
+function evaluateHand(hand: Hand) {
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
   const map = new Map<string, number>();
   for (let c of hand.hand) {
     if (!map.has(c)) {
@@ -75,7 +79,11 @@ export async function day7a(dataPath?: string) {
   }
 
   for (let hand of hands) {
+<<<<<<< HEAD
     evaludateHand(hand);
+=======
+    evaluateHand(hand);
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
   }
 
   hands.sort((h1, h2) => {
@@ -88,8 +96,11 @@ export async function day7a(dataPath?: string) {
     }
   });
 
+<<<<<<< HEAD
   console.log(hands);
 
+=======
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
   let sum = 0;
   for (let i = 0; i < hands.length; i++) {
     sum += (i + 1) * hands[i].bid;

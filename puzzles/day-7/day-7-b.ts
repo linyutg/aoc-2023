@@ -22,7 +22,11 @@ function compare(h1: Hand, h2: Hand) {
   return 0;
 }
 
+<<<<<<< HEAD
 function evaludateHand(hand: Hand) {
+=======
+function evaluateHand(hand: Hand) {
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
   const map = new Map<string, number>();
   for (let c of hand.hand) {
     if (!map.has(c)) {
@@ -46,18 +50,37 @@ function evaludateHand(hand: Hand) {
     }
   }
 
+<<<<<<< HEAD
   if (cards.length === 1 || numOfJ === 4) {
+=======
+  // AAAAA
+  if (cards.length === 1) {
+    hand.level = 7;
+    return;
+  }
+  // JJJJ
+  if (numOfJ === 4) {
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
     hand.level = 7;
     return;
   }
 
+<<<<<<< HEAD
   const [key1, value1] = cards[0];
   const [key2, value2] = cards[1];
+=======
+  const [, value1] = cards[0];
+  const [, value2] = cards[1];
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
 
   // JJJ
   if (numOfJ === 3) {
     // JJJ AA => AAAAA
+<<<<<<< HEAD
     if (value1 === 2) {
+=======
+    if (value2 === 2) {
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
       hand.level = 7;
     } else {
       // A B => AAAA B
@@ -115,6 +138,11 @@ function evaludateHand(hand: Hand) {
   } else {
     hand.level = 1;
   }
+<<<<<<< HEAD
+=======
+
+  return;
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
 }
 
 export async function day7b(dataPath?: string) {
@@ -131,7 +159,11 @@ export async function day7b(dataPath?: string) {
   }
 
   for (let hand of hands) {
+<<<<<<< HEAD
     evaludateHand(hand);
+=======
+    evaluateHand(hand);
+>>>>>>> 8a7ed2ccc8d4eb618149b327839754f9faadff60
   }
 
   hands.sort((h1, h2) => {
