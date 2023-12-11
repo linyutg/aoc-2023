@@ -200,26 +200,33 @@ function isInLoop(
 ): boolean {
   const level = isPointsInLoop(i, j, allPoints);
   if (level >= 0) {
-    console.log('check ', level, 'is in loop');
+    // console.log('check ', level, 'is in loop');
     return false;
   }
-  console.log('check ', i, j);
+  // console.log('check ', i, j);
   let x1 = calcualteCrossNum(i, j, -1, 0, width, height, allPoints);
   let x2 = calcualteCrossNum(i, j, 1, 0, width, height, allPoints);
   let y1 = calcualteCrossNum(i, j, 0, 1, width, height, allPoints);
   let y2 = calcualteCrossNum(i, j, 0, -1, width, height, allPoints);
 
-  console.log(-1, 0, x1);
-  console.log(1, 0, x2);
-  console.log(0, 1, y1);
-  console.log(0, -1, y2);
+  // console.log(x1, x2);
+  // console.log(x1 > 0 && x2 > 0);
+  // console.log(y1, y2);
+  // console.log(y2 > 0 && y2 > 0);
 
-  if (x1 % 2 === 1 || x2 % 2 === 1 || y1 % 2 === 1 || y2 % 2 === 1) {
-    console.log('is in loop');
+  if (x1 == 0 || x2 == 0 || y1 == 0 || y2 == 0) {
+    return false;
+  }
+
+  if (x1 > 0 && x2 > 0 && (x1 % 2 === 1 || x2 % 2 === 1)) {
+    // console.log('is in loop');
     return true;
   }
 
-  console.log('is not in loop');
+  if (y1 > 0 && y2 > 0 && (y1 % 2 === 1 || y2 % 2 === 1)) {
+    // console.log('is in loop');
+    return true;
+  }
   return false;
 }
 
@@ -281,11 +288,14 @@ export async function day10b(dataPath?: string) {
 
   let sum = 0;
   for (let i = 0; i < data.length; i++) {
+    let count = 0;
     for (let j = 0; j < data[i].length; j++) {
       if (isInLoop(i, j, allPoints, data[0].length, data.length)) {
         sum++;
+        count++;
       }
     }
+    console.log('line:', i, count);
   }
 
   return sum;
