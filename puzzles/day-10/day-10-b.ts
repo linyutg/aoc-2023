@@ -14,34 +14,32 @@ type Dir = {
   prevChar: string;
 };
 
-function isVertical(c: string) {
+function isVertical(c: string, x: number) {
   if (c === '|') {
     return true;
   }
-  if (c === '7') {
+  if (x < 0 && (c === '7' || c === 'F')) {
     return true;
-  }
-  if (c === 'F') {
+  } else if (x > 0 && (c === 'J' || c === 'L')) {
     return true;
   }
   return false;
 }
 
-function isHorizontal(c: string) {
+function isHorizontal(c: string, y: number) {
   if (c === '-') {
     return true;
   }
-  if (c === 'L') {
+  if (y > 0 && (c === 'J' || c === '7')) {
     return true;
-  }
-  if (c === 'J') {
+  } else if (y < 0 && (c === 'L' || c === 'F')) {
     return true;
   }
   return false;
 }
 
 function getAllPointsInLoop(sx: number, sy: number, map: string[]) {
-  let ret: [number, number][] = [[sx, sy]];
+  let ret: [number, number, number][] = [[sx, sy, 0]];
   let dir1: Dir;
   let dir2: Dir;
 
@@ -50,8 +48,8 @@ function getAllPointsInLoop(sx: number, sy: number, map: string[]) {
     let startY = sy + y;
     if (map[startX] && map[startX][startY]) {
       if (
-        (x != 0 && isVertical(map[startX][startY])) ||
-        (y != 0 && isHorizontal(map[startX][startY]))
+        (x != 0 && isVertical(map[startX][startY], x)) ||
+        (y != 0 && isHorizontal(map[startX][startY], y))
       ) {
         if (!dir1) {
           dir1 = {
@@ -70,6 +68,7 @@ function getAllPointsInLoop(sx: number, sy: number, map: string[]) {
     }
   }
 
+  let step = 0;
   let s1x = sx;
   let s1y = sy;
   let s2x = sx;
@@ -79,11 +78,13 @@ function getAllPointsInLoop(sx: number, sy: number, map: string[]) {
     s1x += dir1.x;
     s1y += dir1.y;
 
+    step++;
+
     s2x += dir2.x;
     s2y += dir2.y;
 
-    ret.push([s1x, s1y]);
-    ret.push([s2x, s2y]);
+    ret.push([s1x, s1y, step]);
+    ret.push([s2x, s2y, step]);
 
     if (s1x === s2x && s1y === s2y) {
       break;
@@ -96,6 +97,22 @@ function getAllPointsInLoop(sx: number, sy: number, map: string[]) {
     dir2 = getNextDir(dir2, c2);
   }
   return ret;
+}
+
+function dump(data: string[], allPoints: [number, number, number][]) {
+  let s = '';
+  for (let i = 0; i < data.length; i++) {
+    for (let j = 0; j < data[i].length; j++) {
+      const level = isPointsInLoop(i, j, allPoints);
+      if (level >= 0) {
+        s += `${` ${level > 9 ? level : '0' + level} `}`;
+      } else {
+        s += ' ** ';
+      }
+    }
+    s += '\n';
+  }
+  console.log(s);
 }
 
 function getNextDir(curDir: Dir, c: string): Dir {
@@ -177,54 +194,86 @@ function getNextDir(curDir: Dir, c: string): Dir {
 function isInLoop(
   i: number,
   j: number,
-  allPoints: [number, number][],
+  allPoints: [number, number, number][],
   width: number,
   height: number
 ): boolean {
-  for (let [dx, dy] of initDir) {
-    let count = 0;
-    let sx = i;
-    let sy = j;
-    while (true) {
-      sx += dx;
-      sy += dy;
-      if (sx < 0 || sx >= width || sy < 0 || sy >= height) {
-        break;
-      }
-      if (isPointsInLoop(sx, sy, allPoints)) {
-        count++;
-      }
-    }
-
-    if (count % 2 === 0) {
-      console.log(i, j, false);
-      return false;
-    }
+  const level = isPointsInLoop(i, j, allPoints);
+  if (level >= 0) {
+    console.log('check ', level, 'is in loop');
+    return false;
   }
-  console.log(i, j, true);
-  return true;
+  console.log('check ', i, j);
+  let x1 = calcualteCrossNum(i, j, -1, 0, width, height, allPoints);
+  let x2 = calcualteCrossNum(i, j, 1, 0, width, height, allPoints);
+  let y1 = calcualteCrossNum(i, j, 0, 1, width, height, allPoints);
+  let y2 = calcualteCrossNum(i, j, 0, -1, width, height, allPoints);
+
+  console.log(-1, 0, x1);
+  console.log(1, 0, x2);
+  console.log(0, 1, y1);
+  console.log(0, -1, y2);
+
+  if (x1 % 2 === 1 || x2 % 2 === 1 || y1 % 2 === 1 || y2 % 2 === 1) {
+    console.log('is in loop');
+    return true;
+  }
+
+  console.log('is not in loop');
+  return false;
 }
 
-function isPointsInLoop(x: number, y: number, allPoints: [number, number][]) {
-  for (let [sx, sy] of allPoints) {
-    if (x === sx && y === sy) {
-      return true;
+function calcualteCrossNum(
+  i: number,
+  j: number,
+  dx: number,
+  dy: number,
+  width: number,
+  height: number,
+  allPoints: [number, number, number][]
+) {
+  let count = 0;
+  let sx = i;
+  let sy = j;
+  while (true) {
+    sx += dx;
+    sy += dy;
+    if (sx < 0 || sx >= height || sy < 0 || sy >= width) {
+      break;
+    }
+    if (isPointsInLoop(sx, sy, allPoints) >= 0) {
+      count++;
     }
   }
-  return false;
+
+  return count;
+}
+
+function isPointsInLoop(
+  x: number,
+  y: number,
+  allPoints: [number, number, number][]
+) {
+  for (let [sx, sy, level] of allPoints) {
+    if (x === sx && y === sy) {
+      return level;
+    }
+  }
+  return -1;
 }
 
 export async function day10b(dataPath?: string) {
   const data = await readData(dataPath);
   let sx = 0;
   let sy = 0;
-  let allPoints: [number, number][] = [];
+  let allPoints: [number, number, number][] = [];
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < data[i].length; j++) {
       if (data[i][j] === 'S') {
         sx = i;
         sy = j;
         allPoints = getAllPointsInLoop(sx, sy, data);
+        dump(data, allPoints);
         break;
       }
     }
